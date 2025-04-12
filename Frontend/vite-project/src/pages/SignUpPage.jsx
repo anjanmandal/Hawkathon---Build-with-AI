@@ -11,7 +11,7 @@ import {
   MenuItem,
   Link,
 } from '@mui/material';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/Authcontext';
 import api from '../config/apiConfig';
 import { useNavigate } from 'react-router-dom';
 
@@ -31,7 +31,7 @@ const SignUpPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post('/api/auth/register', formData);
+      const res = await api.post('/auth/register', formData);
       if (res.data.user) {
         // Auto-login
         loginUser(res.data.user);

@@ -9,6 +9,7 @@
   "author": "Anjan Mandal",
   "license": "ISC",
   "dependencies": {
+    "@google/genai": "^0.8.0",
     "bcrypt": "^5.1.1",
     "connect-mongo": "^5.1.0",
     "cors": "^2.8.5",
@@ -16,7 +17,9 @@
     "express": "^5.1.0",
     "express-session": "^1.18.1",
     "mongoose": "^8.13.2",
+    "multer": "^1.4.5-lts.2",
     "nodemon": "^3.1.9",
+    "openai": "^4.93.0",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0"
   }

@@ -6,9 +6,16 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const passport = require('passport');
 const cors = require('cors');
+const path = require('path');
 
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
+const conversationRoutes = require('./routes/conversationRoutes');
+const scenarioRoutes=require('./routes/scenarioRoutes')
+const therapyRoutes=require('./routes/therapyRoutes')
+const expressionQuizRoutes = require('./routes/expressionQuizRoutes');
+const expressionRoutes = require('./routes/expressionRoutes');
+const aiScenarioRoutes = require('./routes/aiScenarioRoutes');
 
 const app = express();
 
@@ -48,11 +55,17 @@ app.use(session({
 require('./config/passport'); // loads passport config
 app.use(passport.initialize());
 app.use(passport.session());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // 5. Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-
+app.use('/api/conversation', conversationRoutes);
+app.use('/api/scenario',scenarioRoutes);
+app.use('/api/therapy', therapyRoutes);
+app.use('/api/expressionQuiz', expressionQuizRoutes);
+app.use('/api/expression', expressionRoutes);
+app.use('/api/aiScenario', aiScenarioRoutes);
 // 6. Start server
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {

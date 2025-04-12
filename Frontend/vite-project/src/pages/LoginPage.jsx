@@ -10,7 +10,7 @@ import {
   Button,
   Link,
 } from '@mui/material';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/Authcontext';
 import api from '../config/apiConfig';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,7 +26,7 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post('/api/auth/login', formData);
+      const res = await api.post('/auth/login', formData);
       if (res.data.user) {
         // Update AuthContext
         loginUser(res.data.user);

@@ -1,6 +1,6 @@
 // src/pages/Dashboard.js
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../config/apiConfig';
 import { Typography } from '@mui/material';
 
 const Dashboard = () => {
@@ -8,7 +8,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     // fetch protected route
-    axios.get('http://localhost:4000/api/users/profile', { withCredentials: true })
+    api.get('/users/profile', { withCredentials: true })
       .then(res => {
         setProfile(res.data.user);
       })

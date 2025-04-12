@@ -1,4 +1,3 @@
-// src/layout/Navbar.js
 import React from 'react';
 import { AppBar, Toolbar, Typography, IconButton } from '@mui/material';
 import { useColorMode } from '../theme/CustomThemeProvider';
@@ -9,7 +8,7 @@ const Navbar = () => {
   const { mode, toggleTheme } = useColorMode();
 
   return (
-    <AppBar position="static">
+    <AppBar position="fixed">
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           Autism Support App

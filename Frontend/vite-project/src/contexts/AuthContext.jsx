@@ -9,8 +9,9 @@ export const AuthProvider = ({ children }) => {
 
   // Optional: check session on page load
   useEffect(() => {
-    api.get('/api/users/profile')
+    api.get('/users/profile')
       .then((res) => {
+        console.log(res.data);
         setUser(res.data.user);
       })
       .catch(() => {
@@ -24,7 +25,7 @@ export const AuthProvider = ({ children }) => {
 
   const logoutUser = () => {
     setUser(null);
-    api.get('/api/auth/logout')
+    api.get('/auth/logout')
       .catch((err) => console.error(err));
   };
 
