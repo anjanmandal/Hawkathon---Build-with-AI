@@ -1,7 +1,14 @@
-// client/src/pages/UploadExpressionPage.jsx
 import React, { useState } from 'react';
-import { Box, TextField, Button, Typography } from '@mui/material';
-import api from '../config/apiConfig';  // your axios instance
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Card,
+  CardContent
+} from '@mui/material';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import api from '../config/apiConfig'; // your axios instance
 
 function UploadExpressionPage() {
   const [label, setLabel] = useState('');
@@ -42,51 +49,65 @@ function UploadExpressionPage() {
   };
 
   return (
-    <Box sx={{ maxWidth: 400, margin: 'auto', mt: 4 }}>
-      <Typography variant="h5" gutterBottom>
-        Upload New Expression
-      </Typography>
-
-      <form onSubmit={handleSubmit}>
-        <TextField
-          label="Label"
-          variant="outlined"
-          fullWidth
-          value={label}
-          onChange={(e) => setLabel(e.target.value)}
-          sx={{ mb: 2 }}
-        />
-
-        <Button variant="contained" component="label" sx={{ mb: 2 }}>
-          Select Image
-          <input
-            type="file"
-            hidden
-            accept="image/*"
-            onChange={handleFileChange}
-          />
-        </Button>
-        {selectedFile && (
-          <Typography variant="body2" sx={{ mb: 2 }}>
-            Selected file: {selectedFile.name}
+    <Box sx={{ maxWidth: 500, mx: 'auto', mt: 4 }}>
+      <Card variant="outlined">
+        <CardContent>
+          <Typography variant="h5" gutterBottom>
+            Upload New Expression
           </Typography>
-        )}
 
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          disabled={!label || !selectedFile}
-        >
-          Upload
-        </Button>
-      </form>
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+            <TextField
+              label="Label"
+              variant="outlined"
+              fullWidth
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              sx={{ mb: 2 }}
+            />
 
-      {message && (
-        <Typography variant="body1" color="success.main" sx={{ mt: 2 }}>
-          {message}
-        </Typography>
-      )}
+            <Button
+              variant="contained"
+              component="label"
+              startIcon={<CloudUploadIcon />}
+              sx={{ mb: 2 }}
+            >
+              Select Image
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+            </Button>
+
+            {selectedFile && (
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                Selected file: {selectedFile.name}
+              </Typography>
+            )}
+
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={!label || !selectedFile}
+            >
+              Upload
+            </Button>
+          </Box>
+
+          {message && (
+            <Typography
+              variant="body1"
+              sx={{ mt: 2 }}
+              color={message.startsWith('Success') ? 'success.main' : 'error.main'}
+            >
+              {message}
+            </Typography>
+          )}
+        </CardContent>
+      </Card>
     </Box>
   );
 }

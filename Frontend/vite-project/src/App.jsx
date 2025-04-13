@@ -27,6 +27,7 @@ import SkillProgressChart from './pages/SkillProgressChart';
 import AssociatedUsersPage from './pages/AssociatedUsersPage';
 import SkillProgressChartParent from './pages/SkillProgressChartParent';
 import ReportsPage from './pages/ReportsPage';
+import FacialExpressionQuiz from './pages/FacialExpressionQuiz';
 
 
 function PrivateRoute({ children }) {
@@ -136,7 +137,7 @@ function App() {
               element={
                 <PrivateRoute>
                   <Layout>
-                    <FacialExpressionGame />
+                    <FacialExpressionQuiz />
                   </Layout>
                 </PrivateRoute>
               }

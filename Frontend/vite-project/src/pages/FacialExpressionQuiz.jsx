@@ -8,7 +8,8 @@ import {
   Radio,
   Card,
   CardContent,
-  CardMedia
+  CardMedia,
+  Divider
 } from '@mui/material';
 import api from '../config/apiConfig'; // your axios instance
 
@@ -111,76 +112,86 @@ function FacialExpressionQuiz() {
   };
 
   return (
-    <Box sx={{ textAlign: 'center', mt: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Facial Expression Quiz
-      </Typography>
-
-      <Typography variant="subtitle1">Points: {points}</Typography>
-      <Typography variant="subtitle2">
-        Expression {currentIndex + 1} / {totalExpressions}
-      </Typography>
-
-      {imageUrl && (
-        <Card sx={{ maxWidth: 300, margin: '0 auto', mt: 2 }}>
-          <CardMedia
-            component="img"
-            height="300"
-            image={imageUrl} // use the full URL we constructed
-            alt="expression"
-          />
-          <CardContent>
-            <RadioGroup
-              value={selectedGuess}
-              onChange={(e) => setSelectedGuess(e.target.value)}
-            >
-              {possibleEmotions.map((emo) => (
-                <FormControlLabel
-                  key={emo}
-                  value={emo}
-                  control={<Radio />}
-                  label={emo}
-                />
-              ))}
-            </RadioGroup>
-            <Button
-              variant="contained"
-              onClick={handleGuess}
-              disabled={done || !selectedGuess}
-            >
-              Submit Guess
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {feedback && (
-        <Typography variant="body1" sx={{ mt: 2 }}>
-          {feedback}
-        </Typography>
-      )}
-
-      <Box sx={{ mt: 3 }}>
-        {!done && (
-          <Button variant="outlined" color="secondary" onClick={handleCloseSession}>
-            Close Session
-          </Button>
-        )}
-        {done && (
-          <Button variant="contained" sx={{ ml: 2 }} onClick={startNewSession}>
-            Start New Session
-          </Button>
-        )}
-      </Box>
-
-      {showCloseSummary && (
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="h5">Final Summary</Typography>
-          <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
-            {showCloseSummary}
+    <Box sx={{ maxWidth: 600, mx: 'auto', mt: 4 }}>
+      <Card variant="outlined">
+        <CardContent>
+          <Typography variant="h4" gutterBottom textAlign="center">
+            Facial Expression Quiz
           </Typography>
-        </Box>
-      )}
+          
+          <Divider sx={{ mb: 2 }} />
+
+          <Typography variant="subtitle1" textAlign="center">
+            Points: {points}
+          </Typography>
+          <Typography variant="subtitle2" textAlign="center">
+            Expression {currentIndex + 1} / {totalExpressions}
+          </Typography>
+
+          {imageUrl && (
+            <Card sx={{ maxWidth: 300, margin: '1rem auto 0 auto' }}>
+              <CardMedia
+                component="img"
+                height="300"
+                image={imageUrl} // use the full URL we constructed
+                alt="expression"
+              />
+              <CardContent>
+                <RadioGroup
+                  value={selectedGuess}
+                  onChange={(e) => setSelectedGuess(e.target.value)}
+                >
+                  {possibleEmotions.map((emo) => (
+                    <FormControlLabel
+                      key={emo}
+                      value={emo}
+                      control={<Radio />}
+                      label={emo}
+                    />
+                  ))}
+                </RadioGroup>
+                <Button
+                  variant="contained"
+                  onClick={handleGuess}
+                  disabled={done || !selectedGuess}
+                >
+                  Submit Guess
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {feedback && (
+            <Typography variant="body1" sx={{ mt: 2, textAlign: 'center' }}>
+              {feedback}
+            </Typography>
+          )}
+
+          <Box sx={{ mt: 3, textAlign: 'center' }}>
+            {!done && (
+              <Button variant="outlined" color="secondary" onClick={handleCloseSession}>
+                Close Session
+              </Button>
+            )}
+            {done && (
+              <Button variant="contained" sx={{ ml: 2 }} onClick={startNewSession}>
+                Start New Session
+              </Button>
+            )}
+          </Box>
+
+          {showCloseSummary && (
+            <Box sx={{ mt: 3 }}>
+              <Typography variant="h5" gutterBottom>
+                Final Summary
+              </Typography>
+              <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
+                {showCloseSummary}
+              </Typography>
+            </Box>
+          )}
+        </CardContent>
+      </Card>
     </Box>
   );
 }
