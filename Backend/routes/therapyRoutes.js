@@ -4,6 +4,12 @@ const router = express.Router();
  const { ensureAuth } = require('../middlewares/authMiddleware'); // if you have an auth system
 const therapyController = require('../controllers/therapyController');
 
+
+router.get(
+    '/reports/:targetUserId',
+    ensureAuth,
+    therapyController.getSessionReportsForUser
+  );
 // Start or resume a therapy session
 router.post('/start',ensureAuth, therapyController.startSession);
 

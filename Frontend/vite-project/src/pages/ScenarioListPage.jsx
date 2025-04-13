@@ -45,7 +45,7 @@ const ScenariosListPage = () => {
             const newestSession = sessions[0];
             const lastMsg = newestSession.messages[newestSession.messages.length - 1];
             if (lastMsg) {
-              // show up to 50 chars for brevity
+              // Show up to 50 chars for brevity
               lastMessage = lastMsg.content.slice(0, 50);
               if (lastMsg.content.length > 50) lastMessage += '...';
             }
@@ -91,7 +91,7 @@ const ScenariosListPage = () => {
     }
   };
 
-  // Open the conversation for scenario
+  // Open the conversation for the scenario
   const handleOpenScenario = (scenarioId) => {
     navigate(`/conversation/chat/${scenarioId}`);
   };
@@ -103,19 +103,19 @@ const ScenariosListPage = () => {
       field: 'attempts',
       headerName: 'Attempts',
       flex: 0.5,
-      minWidth: 80,
+      width: 80,
     },
     {
       field: 'badges',
       headerName: 'Badges',
-      flex: 1,
-      minWidth: 150,
+      flex: 0.5,
+      width: 120,
     },
     {
       field: 'lastMessage',
       headerName: 'Last Chat',
-      flex: 2,
-      minWidth: 200,
+      flex: 0.1,
+      width: 100,
     },
     {
       field: 'actions',
@@ -124,34 +124,31 @@ const ScenariosListPage = () => {
       filterable: false,
       disableClickEventBubbling: true,
       flex: 1,
-      minWidth: 200,
-      renderCell: (params) => {
-        return (
-          <Box>
-            <Button
-              variant="outlined"
-              size="small"
-              sx={{ mr: 1 }}
-              onClick={() => handleOpenScenario(params.row.id)}
-            >
-              Open Chat
-            </Button>
-            <Button
-              variant="contained"
-              size="small"
-              onClick={() => handleMarkComplete(params.row.id)}
-            >
-              Mark Complete
-            </Button>
-          </Box>
-        );
-      },
+      width:100,
+      renderCell: (params) => (
+        <Box>
+          <Button
+            variant="outlined"
+            size="small"
+            sx={{ mr: 1 }}
+            onClick={() => handleOpenScenario(params.row.id)}
+          >
+            Open Chat
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => handleMarkComplete(params.row.id)}
+          >
+            Mark Complete
+          </Button>
+        </Box>
+      ),
     },
   ];
 
   return (
-    <Card sx={{ mt: 4, mx: { xs: 2, md: 4 } }}
-    variant='outlined'>
+    <Card sx={{ mt: 4, mx: { xs: 2, md: 4 } }} variant="outlined">
       <CardContent>
         <Typography variant="h4" gutterBottom>
           DB-Based Role-Play Scenarios

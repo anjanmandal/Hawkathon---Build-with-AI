@@ -13,13 +13,47 @@ import {
 import { Link } from 'react-router-dom';
 import HomeIcon from '@mui/icons-material/Home';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import FaceIcon from '@mui/icons-material/Face';
+import TheaterComedyIcon from '@mui/icons-material/TheaterComedy';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
+import QuizIcon from '@mui/icons-material/Quiz';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
+import ForumIcon from '@mui/icons-material/Forum';
+import PeopleIcon from '@mui/icons-material/People'; // For associated users
+import { useAuth } from '../contexts/Authcontext';
 
 const drawerWidth = 240;
 
 const Sidebar = () => {
+  const { user } = useAuth();
+  const role = user?.role;
+
+  // Parent or Healthcare Provider
+  const isParentOrProvider = role === 'parent' || role === 'healthcareProvider';
+
+  // Links for "parent" or "healthcareProvider"
+  const parentOrProviderLinks = [
+    { to: '/', icon: <HomeIcon fontSize="large" />, label: 'Home' },
+    { to: '/dashboard', icon: <DashboardIcon fontSize="large" />, label: 'Dashboard' },
+    { to: '/upload-expression', icon: <CloudUploadIcon fontSize="large" />, label: 'Upload Expression' },
+    { to: '/conversations', icon: <ForumIcon fontSize="large" />, label: 'Community' },
+    { to: '/associated-users', icon: <PeopleIcon fontSize="large" />, label: 'Associated Users' },
+  ];
+
+  // Links for "regular user": show everything except Associated Users & Upload Expression
+  const userLinks = [
+    { to: '/', icon: <HomeIcon fontSize="large" />, label: 'Home' },
+    { to: '/dashboard', icon: <DashboardIcon fontSize="large" />, label: 'Dashboard' },
+    { to: '/scenarios', icon: <TheaterComedyIcon fontSize="large" />, label: 'Role-Play Scenarios' },
+    { to: '/therapy', icon: <LocalHospitalIcon fontSize="large" />, label: 'Therapy' },
+    { to: '/facial-expression-game', icon: <QuizIcon fontSize="large" />, label: 'Expression Quiz' },
+    { to: '/ai-scenarios', icon: <SmartToyIcon fontSize="large" />, label: 'AI Scenarios' },
+    { to: '/conversations', icon: <ForumIcon fontSize="large" />, label: 'Community' },
+  ];
+
+  // Choose which array of links to render
+  const navLinks = isParentOrProvider ? parentOrProviderLinks : userLinks;
+
   return (
     <Drawer
       variant="permanent"
@@ -39,9 +73,9 @@ const Sidebar = () => {
       <Toolbar sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
         <Box
           component="img"
-          src="/autism_talk.png" // Replace with your logo's path
+          src="/autism_talk.png" // Replace with your logo path
           alt="Logo"
-          sx={{ height: 10}}
+          sx={{ height: 40 }}
         />
       </Toolbar>
 
@@ -49,60 +83,14 @@ const Sidebar = () => {
 
       {/* Navigation Links */}
       <List>
-        <ListItem disablePadding>
-          <ListItemButton component={Link} to="/">
-            <ListItemIcon>
-              <HomeIcon fontSize="large" /> {/* Increased size */}
-            </ListItemIcon>
-            <ListItemText primary="Home" />
-          </ListItemButton>
-        </ListItem>
-
-        <ListItem disablePadding>
-          <ListItemButton component={Link} to="/dashboard">
-            <ListItemIcon>
-              <DashboardIcon fontSize="large" /> {/* Increased size */}
-            </ListItemIcon>
-            <ListItemText primary="Dashboard" />
-          </ListItemButton>
-        </ListItem>
-
-        <ListItem disablePadding>
-          <ListItemButton component={Link} to="/scenarios">
-            <ListItemIcon>
-              <FaceIcon fontSize="large" /> {/* Increased size */}
-            </ListItemIcon>
-            <ListItemText primary="Role-Play Scenarios" />
-          </ListItemButton>
-        </ListItem>
-
-        {/* Virtual Therapist Route */}
-        <ListItem disablePadding>
-          <ListItemButton component={Link} to="/therapy">
-            <ListItemIcon>
-              <LocalHospitalIcon fontSize="large" /> {/* Increased size */}
-            </ListItemIcon>
-            <ListItemText primary="Therapy" />
-          </ListItemButton>
-        </ListItem>
-        
-        <ListItem disablePadding>
-          <ListItemButton component={Link} to="/facial-expression-game">
-            <ListItemIcon>
-              <FaceIcon fontSize="large" /> {/* Increased size */}
-            </ListItemIcon>
-            <ListItemText primary="Expression Quiz" />
-          </ListItemButton>
-        </ListItem>
-        
-        <ListItem disablePadding>
-          <ListItemButton component={Link} to="/upload-expression">
-            <ListItemIcon>
-              <CloudUploadIcon fontSize="large" /> {/* Increased size */}
-            </ListItemIcon>
-            <ListItemText primary="Upload Expression" />
-          </ListItemButton>
-        </ListItem>
+        {navLinks.map((item) => (
+          <ListItem disablePadding key={item.to}>
+            <ListItemButton component={Link} to={item.to}>
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.label} />
+            </ListItemButton>
+          </ListItem>
+        ))}
       </List>
     </Drawer>
   );

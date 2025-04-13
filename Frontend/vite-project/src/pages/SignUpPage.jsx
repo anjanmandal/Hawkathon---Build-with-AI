@@ -1,5 +1,4 @@
-// client/src/pages/SignUpPage.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Card,
@@ -10,32 +9,69 @@ import {
   Button,
   MenuItem,
   Link,
+  FormControl,
+  InputLabel,
+  Select,
+  OutlinedInput,
+  Chip,
 } from '@mui/material';
-import { useAuth } from '../contexts/Authcontext';
 import api from '../config/apiConfig';
 import { useNavigate } from 'react-router-dom';
 
 const SignUpPage = () => {
   const navigate = useNavigate();
-  const { loginUser } = useAuth();
+  const [availableUsers, setAvailableUsers] = useState([]);
+
+  // Initialize formData with extra fields.
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     role: 'user',
+    firstName: '',
+    lastName: '',
+    bio: '',
+    relatedUsers: [],
   });
 
+  // When role is parent or healthcareProvider, fetch available users.
+  useEffect(() => {
+    if (formData.role === 'parent' || formData.role === 'healthcareProvider') {
+      fetchAvailableUsers();
+    }
+  }, [formData.role]);
+
+  const fetchAvailableUsers = async () => {
+    try {
+      const res = await api.get('/users');
+      if (res.data && res.data.users) {
+        setAvailableUsers(res.data.users);
+      }
+    } catch (err) {
+      console.error('Error fetching users:', err);
+    }
+  };
+
+  // Generic handler for inputs.
   const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Handler for the multi-select field.
+  const handleSelectChange = (e) => {
+    const { name, value } = e.target;
+    // value is already an array because the Select component is multiple.
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Submit formData (relatedUsers is already an array).
       const res = await api.post('/auth/register', formData);
-      if (res.data.user) {
-        // Auto-login
-        loginUser(res.data.user);
-        navigate('/');
+      if (res.data.message) {
+        // Navigate to login page upon successful registration.
+        navigate('/login');
       }
     } catch (err) {
       alert(err.response?.data?.message || 'Signup error');
@@ -118,6 +154,65 @@ const SignUpPage = () => {
               <MenuItem value="parent">Parent</MenuItem>
               <MenuItem value="healthcareProvider">Healthcare Provider</MenuItem>
             </TextField>
+
+            {/* Always show these fields for additional information */}
+            <TextField
+              size="medium"
+              label="First Name"
+              name="firstName"
+              variant="outlined"
+              value={formData.firstName}
+              onChange={handleChange}
+            />
+            <TextField
+              size="medium"
+              label="Last Name"
+              name="lastName"
+              variant="outlined"
+              value={formData.lastName}
+              onChange={handleChange}
+            />
+            <TextField
+              size="medium"
+              label="Bio"
+              name="bio"
+              variant="outlined"
+              value={formData.bio}
+              onChange={handleChange}
+              multiline
+              rows={3}
+            />
+
+            {/* Show related users multi-select only if the role is Parent or Healthcare Provider */}
+            {(formData.role === 'parent' || formData.role === 'healthcareProvider') && (
+              <FormControl fullWidth>
+                <InputLabel id="related-users-label">Select Related Users</InputLabel>
+                <Select
+                  labelId="related-users-label"
+                  id="related-users"
+                  name="relatedUsers"
+                  multiple
+                  value={formData.relatedUsers}
+                  onChange={handleSelectChange}
+                  input={<OutlinedInput label="Select Related Users" />}
+                  renderValue={(selected) => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {selected.map((value) => {
+                        const user = availableUsers.find((u) => u._id === value);
+                        return <Chip key={value} label={user ? user.email : value} />;
+                      })}
+                    </Box>
+                  )}
+                >
+                  {availableUsers.map((user) => (
+                    <MenuItem key={user._id} value={user._id}>
+                      {user.email} {user.firstName ? `- ${user.firstName} ${user.lastName}` : ''}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+
             <Button type="submit" variant="contained" size="medium">
               Sign Up
             </Button>

@@ -147,3 +147,29 @@ exports.getSessionReports = async (req, res) => {
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+
+
+/**
+ * Get closed therapy sessions (reports) for a specific user (targetUserId).
+ * Typically parents / providers can view these if authorized.
+ */
+exports.getSessionReportsForUser = async (req, res) => {
+  try {
+    const { targetUserId } = req.params;
+
+    // If needed, you can add checks here:
+    // 1) ensure the requesting user is a parent/healthcareProvider
+    // 2) verify that targetUserId is actually related to this user, etc.
+
+    const sessions = await TherapySession.find({
+      userId: targetUserId,
+      isOpen: false
+    }).sort({ closedAt: -1 });
+
+    return res.json(sessions);
+  } catch (error) {
+    console.error('Error in getSessionReportsForUser:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};

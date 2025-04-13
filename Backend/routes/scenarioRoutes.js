@@ -15,5 +15,6 @@ router.get('/:scenarioId/skill', ensureAuth, scenarioController.getUserSkillProg
 
 // POST update skill progress
 router.post('/:scenarioId/skill', ensureAuth, scenarioController.updateUserSkillProgress);
+router.get('/user/:userId/progress', ensureAuth, scenarioController.getAllScenariosForUser);
 
 module.exports = router;

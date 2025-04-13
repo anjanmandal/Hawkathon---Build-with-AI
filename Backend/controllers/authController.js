@@ -4,20 +4,28 @@ const User = require('../models/User');
 
 exports.register = async (req, res) => {
   try {
-    const { email, password, role } = req.body;
+    const { email, password, role, firstName, lastName, bio, relatedUsers } = req.body;
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'Email already in use' });
     }
 
-    const newUser = new User({ email, password, role });
+    // Create new user with additional fields;
+    // relatedUsers is expected to be an array of user IDs.
+    const newUser = new User({
+      email,
+      password,
+      role,
+      firstName,
+      lastName,
+      bio,
+      relatedUsers,
+    });
     await newUser.save();
 
-    // Auto-login after registration (optional)
-    req.login(newUser, (err) => {
-      if (err) return res.status(500).json({ message: err.message });
-      return res.status(201).json({ message: 'Registered successfully', user: newUser });
-    });
+    // Return a success message (no auto-login).
+    return res.status(201).json({ message: 'Registered successfully' });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -39,7 +47,7 @@ exports.login = (req, res, next) => {
 };
 
 exports.logout = (req, res) => {
-  req.logout(function(err) {
+  req.logout(function (err) {
     if (err) {
       return res.status(500).json({ message: 'Error logging out' });
     }

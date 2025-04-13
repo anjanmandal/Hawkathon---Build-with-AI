@@ -3,9 +3,11 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import api from '../config/apiConfig';
 
 const AuthContext = createContext();
+import { useNavigate } from 'react-router-dom';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+   const navigate = useNavigate();
 
   // Optional: check session on page load
   useEffect(() => {
@@ -26,6 +28,9 @@ export const AuthProvider = ({ children }) => {
   const logoutUser = () => {
     setUser(null);
     api.get('/auth/logout')
+    .then(()=>{
+      navigate('/login')
+    })
       .catch((err) => console.error(err));
   };
 

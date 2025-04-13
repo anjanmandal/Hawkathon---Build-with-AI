@@ -18,10 +18,15 @@ import GeminiEmotionExercise from './pages/FacialExpressionQuiz';
 import { TherapyProvider } from './contexts/TherapyContext';
 import UploadExpressionPage from './pages/UploadExpressionPage';
 import AIScenarioLearning from './pages/AIScenarioLearning';
+import ConversationListPage from './pages/ConversationListPage';
 
 
 // New Virtual Therapist pages
 import TherapySessionPage from './pages/TherapySessionPage';
+import SkillProgressChart from './pages/SkillProgressChart';
+import AssociatedUsersPage from './pages/AssociatedUsersPage';
+import SkillProgressChartParent from './pages/SkillProgressChartParent';
+import ReportsPage from './pages/ReportsPage';
 
 
 function PrivateRoute({ children }) {
@@ -155,6 +160,55 @@ function App() {
       </Layout>
     </PrivateRoute>
   }
+/>
+<Route
+  path="/conversations"
+  element={
+    <PrivateRoute>
+      <Layout>
+        <ConversationListPage />
+      </Layout>
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="/skill-progress"
+  element={
+    <PrivateRoute>
+      <Layout>
+        <SkillProgressChart />
+      </Layout>
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="/associated-users"
+  element={
+    <PrivateRoute>
+      <Layout>
+        <AssociatedUsersPage />
+      </Layout>
+    </PrivateRoute>
+  }
+/>
+<Route 
+path="/progress/:userId" 
+element={ 
+<PrivateRoute>
+      <Layout>
+        <SkillProgressChartParent />
+        </Layout> 
+        </PrivateRoute>} 
+/>
+<Route 
+path="/reports/:userId" 
+element={
+  <PrivateRoute>
+      <Layout>
+<ReportsPage />
+</Layout>
+</PrivateRoute>
+} 
 />
         </Routes>
         </TherapyProvider>
