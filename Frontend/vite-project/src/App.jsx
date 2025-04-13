@@ -156,8 +156,6 @@ function App() {
     </PrivateRoute>
   }
 />
-
-
         </Routes>
         </TherapyProvider>
       </CustomThemeProvider>

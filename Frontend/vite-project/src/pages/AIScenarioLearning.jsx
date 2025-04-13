@@ -6,7 +6,8 @@ import {
   CircularProgress,
   Card,
   CardContent,
-  LinearProgress
+  LinearProgress,
+  
 } from '@mui/material';
 import api from '../config/apiConfig';
 
@@ -166,6 +167,7 @@ function AISimpleScenario() {
 
   return (
     <Box sx={{ maxWidth: 700, margin: 'auto', mt: 4 }}>
+        <Card variant='outlined'>
       {/* Top bar with End Session */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h5">AI Scenario-Based Learning (Sound to Sound)</Typography>
@@ -274,6 +276,7 @@ function AISimpleScenario() {
           </CardContent>
         </Card>
       )}
+      </Card>
     </Box>
   );
 }

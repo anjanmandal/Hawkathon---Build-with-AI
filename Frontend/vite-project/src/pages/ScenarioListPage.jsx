@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Alert, Button } from '@mui/material';
+import { Box, Typography, Alert, Button, Card, CardContent } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
 import api from '../config/apiConfig';
@@ -40,7 +40,7 @@ const ScenariosListPage = () => {
         let lastMessage = 'No chat yet';
         try {
           const sessRes = await api.get(`/conversation/sessions?scenarioId=${scenarioId}`);
-          const sessions = sessRes.data; // sorted by createdAt: -1 if we coded that
+          const sessions = sessRes.data; // sorted by createdAt: -1 if coded that way
           if (sessions.length > 0) {
             const newestSession = sessions[0];
             const lastMsg = newestSession.messages[newestSession.messages.length - 1];
@@ -150,27 +150,30 @@ const ScenariosListPage = () => {
   ];
 
   return (
-    <Box sx={{ mt: 4, px: { xs: 2, md: 4 } }}>
-      <Typography variant="h4" gutterBottom>
-        DB-Based Role-Play Scenarios
-      </Typography>
+    <Card sx={{ mt: 4, mx: { xs: 2, md: 4 } }}
+    variant='outlined'>
+      <CardContent>
+        <Typography variant="h4" gutterBottom>
+          DB-Based Role-Play Scenarios
+        </Typography>
 
-      {feedback && (
-        <Alert severity="success" sx={{ mb: 2 }}>
-          {feedback}
-        </Alert>
-      )}
+        {feedback && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            {feedback}
+          </Alert>
+        )}
 
-      <Box sx={{ height: 500, width: '100%' }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          pageSize={10}
-          rowsPerPageOptions={[10, 25, 50]}
-          autoHeight
-        />
-      </Box>
-    </Box>
+        <Box sx={{ height: 500, width: '100%' }}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            pageSize={10}
+            rowsPerPageOptions={[10, 25, 50]}
+            autoHeight
+          />
+        </Box>
+      </CardContent>
+    </Card>
   );
 };
 

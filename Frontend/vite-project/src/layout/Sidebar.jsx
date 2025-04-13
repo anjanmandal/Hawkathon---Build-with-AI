@@ -41,7 +41,7 @@ const Sidebar = () => {
           component="img"
           src="/autism_talk.png" // Replace with your logo's path
           alt="Logo"
-          sx={{ height: 100 }}
+          sx={{ height: 10}}
         />
       </Toolbar>
 

@@ -8,7 +8,7 @@ const Navbar = () => {
   const { mode, toggleTheme } = useColorMode();
 
   return (
-    <AppBar position="fixed">
+    <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           Autism Support App

@@ -5,44 +5,39 @@ import Sidebar from './Sidebar';
 import Footer from './Footer';
 import { useAuth } from '../contexts/Authcontext';
 
-const drawerWidth = 240; // Same width you use for <Sidebar />
+const drawerWidth = 240;
 
 const Layout = ({ children }) => {
   const { isAuthenticated } = useAuth();
 
   return (
-    // Parent container with `display: flex` so sidebar and main content
-    // stay side by side.
-    <Box sx={{ display: 'flex' }}>
+    <>
       <CssBaseline />
-
-      {/* Fixed Navbar */}
+      {/* Render Navbar outside the flex container */}
       {isAuthenticated && <Navbar />}
-
-      {/* Permanent Drawer (Sidebar) */}
-      {isAuthenticated && <Sidebar />}
-
-      {/* Main content */}
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          // Reserve space for the sidebar on medium+ screens
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          marginLeft: { sm: `${drawerWidth}px` },
-          // If Navbar is fixed, push content down by Navbar height (usually 64px)
-          // so it doesn’t hide behind the AppBar.
-          mt: 8,
-          p: 2,
-        }}
-      >
-        {/* Your page content */}
-        {children}
-
-        {/* Footer (also offset to align with main content) */}
-        <Footer />
+      
+      <Box sx={{ display: 'flex' }}>
+        {/* Sidebar appears on the left */}
+        {isAuthenticated && <Sidebar />}
+        
+        {/* Main content area is offset by the drawer width on medium screens and larger */}
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            p: 3,
+            width: { sm: isAuthenticated ? `calc(100% - ${drawerWidth}px)` : '100%' },
+          
+          }}
+        >
+          {/* Toolbar adds vertical spacing equal to the AppBar height */}
+          <Toolbar />
+          {children}
+        </Box>
       </Box>
-    </Box>
+      
+      <Footer />
+    </>
   );
 };
 
