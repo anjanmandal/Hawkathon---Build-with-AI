@@ -160,13 +160,13 @@ const ScenariosListPage = () => {
           </Alert>
         )}
 
-        <Box sx={{ height: 500, width: '100%' }}>
+        <Box sx={{ height: '70vh', width: '100%' }}>
           <DataGrid
             rows={rows}
             columns={columns}
-            pageSize={10}
+            pageSize={25}
             rowsPerPageOptions={[10, 25, 50]}
-            autoHeight
+          
           />
         </Box>
       </CardContent>

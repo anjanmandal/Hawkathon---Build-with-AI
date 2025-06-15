@@ -14,7 +14,7 @@ import {
 import api from '../config/apiConfig'; // your axios instance
 
 // optional: define possibleEmotions or fetch them dynamically
-const possibleEmotions = ['laughing', 'happy', 'sad', 'angry', 'surprised'];
+const possibleEmotions = ['laughing', 'happy', 'sad', 'angry', 'surprised','frustrated'];
 
 function FacialExpressionQuiz() {
   const [sessionId, setSessionId] = useState(null);

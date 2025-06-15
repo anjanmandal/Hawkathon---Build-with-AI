@@ -14,7 +14,7 @@ exports.startSession = async (req, res) => {
       role: 'system',
       content: `
         You are an AI that strictly returns a JSON array.
-        The user wants ${numberOfScenarios} real-world scenarios.
+        The user wants ${numberOfScenarios} real-world scenarios that will help autistic people learn social skills and good communication and must be approprite to teach them communication and social skills.
         Each array element must have exactly one field:
           "scenarioDescription"
         Example:

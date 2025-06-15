@@ -1,97 +1,139 @@
 // server/controllers/conversationController.js
 const ConversationSession = require('../models/ConversationSession');
-const openaiService = require('../services/openaiService'); // your GPT-4 or Gemini logic
-const scenarioData = require('../scenarios/conversationScenarios'); 
+const openaiService = require('../services/openaiService');
+const Scenario = require('../models/Scenario');
 const SkillProgress = require('../models/Skillprogress');
-// Or you can also fetch from DB if using the Scenario model
 
-exports.listScenarios = (req, res) => {
-  // If you're storing scenario definitions in a plain file, we just send them
-  // If you're using the DB-based Scenario model, you can do scenarioController.getAllScenarios
-  res.json(scenarioData);
+/**
+ * Build the initial assistant message solely from the DB.
+ * If the scenario isn’t found, fall back to a generic greeting.
+ */
+async function buildIntroMessage(scenarioId) {
+  const scenario = await Scenario.findOne({ scenarioId }).lean();
+
+  if (!scenario) {
+    return '👋 Hi! I\'m your conversation coach. Ready to practise?';
+  }
+
+  const firstStage = scenario.difficultyStages?.[0]?.stageDescription || '';
+  return [
+    `👋 **${scenario.title}**`,
+    scenario.description,
+    firstStage && `⭐ *Today\'s goal:* ${firstStage}`,
+  ]
+    .filter(Boolean)
+    .join('\n\n');
+}
+
+// ---------------------------------------------------------------------------
+// ROUTES
+// ---------------------------------------------------------------------------
+
+/**
+ * GET /scenario – list all scenarios straight from the DB.
+ */
+exports.listScenarios = async (req, res) => {
+  try {
+    const scenarios = await Scenario.find().lean();
+    res.json(scenarios);
+  } catch (err) {
+    console.error('Error listing scenarios:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 };
+
+/**
+ * GET /conversation/scenarioSession/:scenarioId
+ * Creates a new session with an intro message if none exists.
+ */
 exports.getOrCreateScenarioSession = async (req, res) => {
-    try {
-      const { scenarioId } = req.params;
-      // Check if user already has a session for that scenario
-      let session = await ConversationSession.findOne({
+  try {
+    const { scenarioId } = req.params;
+
+    let session = await ConversationSession.findOne({
+      userId: req.user._id,
+      scenarioId,
+    });
+
+    if (!session) {
+      session = await ConversationSession.create({
         userId: req.user._id,
         scenarioId,
+        messages: [
+          {
+            role: 'assistant',
+            content: await buildIntroMessage(scenarioId),
+          },
+        ],
       });
-      if (!session) {
-        // create one with only system instructions if needed
-        session = await ConversationSession.create({
-          userId: req.user._id,
-          scenarioId,
-          messages: [], 
-        });
-      }
-      return res.json(session);
-    } catch (error) {
-      console.error('Error in getOrCreateScenarioSession:', error);
-      return res.status(500).json({ message: 'Internal server error' });
     }
-  };
 
-  // DELETE scenario session to reset chat
+    res.json(session);
+  } catch (error) {
+    console.error('Error in getOrCreateScenarioSession:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+/**
+ * DELETE /conversation/scenarioSession/:scenarioId – reset chat for a scenario.
+ */
 exports.resetScenarioSession = async (req, res) => {
-    try {
-      const { scenarioId } = req.params;
-      // remove session for user + scenario
-      await ConversationSession.deleteOne({
-        userId: req.user._id,
-        scenarioId,
-      });
-      return res.json({ message: 'Session reset successfully' });
-    } catch (error) {
-      console.error('Error in resetScenarioSession:', error);
-      return res.status(500).json({ message: 'Internal server error' });
-    }
-  };
+  try {
+    const { scenarioId } = req.params;
+    await ConversationSession.deleteOne({
+      userId: req.user._id,
+      scenarioId,
+    });
+    res.json({ message: 'Session reset successfully' });
+  } catch (error) {
+    console.error('Error in resetScenarioSession:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
 
-
-// The handleConversation remains mostly the same...
-// but we might also want it to find or create session automatically if none found
+/**
+ * POST /conversation/chat – user sends a message and receives an AI reply.
+ */
 exports.handleConversation = async (req, res) => {
   try {
     const { scenarioId, userMessage, sessionId } = req.body;
 
-    // (1) find or create session 
+    // 1️⃣ Locate or create session (seed intro if needed)
     let session;
     if (sessionId) {
       session = await ConversationSession.findById(sessionId);
     } else {
-      // If not passing sessionId, find by (userId, scenarioId)
       session = await ConversationSession.findOne({
         userId: req.user._id,
         scenarioId,
       });
     }
-    // If still no session, create new
+
     if (!session) {
       session = await ConversationSession.create({
         userId: req.user._id,
         scenarioId,
-        messages: [],
+        messages: [
+          { role: 'assistant', content: await buildIntroMessage(scenarioId) },
+        ],
       });
     }
 
-    // (2) add user message
+    // 2️⃣ Append user message
     session.messages.push({ role: 'user', content: userMessage });
     await session.save();
 
-    // (3) call AI
-    const messagesForAI = session.messages.map((m) => ({
-      role: m.role,
-      content: m.content,
-    }));
-    const aiReply = await openaiService.getChatCompletion(messagesForAI);
+    // 3️⃣ AI completion
+    const aiReply = await openaiService.getChatCompletion(
+      session.messages.map((m) => ({ role: m.role, content: m.content }))
+    );
 
-    // (4) save AI reply
+    // 4️⃣ Store and return reply
     session.messages.push({ role: 'assistant', content: aiReply });
     await session.save();
 
-    // (5) update skill progress automatically (like before)
+    // 5️⃣ Update progress
     let progress = await SkillProgress.findOne({
       userId: req.user._id,
       scenarioId,
@@ -104,9 +146,7 @@ exports.handleConversation = async (req, res) => {
         badges: [],
       });
     }
-    // e.g. increment attempts
     progress.attempts += 1;
-    // example badge awarding
     if (progress.attempts >= 5 && !progress.badges.includes('ChatterBox')) {
       progress.badges.push('ChatterBox');
     }
@@ -115,7 +155,7 @@ exports.handleConversation = async (req, res) => {
     }
     await progress.save();
 
-    return res.json({
+    res.json({
       sessionId: session._id,
       reply: aiReply,
       skillProgress: {
@@ -125,9 +165,13 @@ exports.handleConversation = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in handleConversation:', error);
-    return res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+// ---------------------------------------------------------------------------
+// Misc helpers
+// ---------------------------------------------------------------------------
 
 exports.listSessions = async (req, res) => {
   try {
@@ -137,27 +181,21 @@ exports.listSessions = async (req, res) => {
     res.json(sessions);
   } catch (err) {
     console.error('Error listing sessions:', err);
-    return res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
-// server/controllers/conversationController.js
 exports.getSession = async (req, res) => {
-    try {
-      const { sessionId } = req.params;
-      const session = await ConversationSession.findById(sessionId);
-      if (!session) {
-        return res.status(404).json({ message: 'Session not found' });
-      }
-      // Optionally verify it belongs to the requesting user
-      if (!session.userId.equals(req.user._id)) {
-        return res.status(403).json({ message: 'Not your session' });
-      }
-  
-      return res.json(session);
-    } catch (error) {
-      console.error('Error in getSession:', error);
-      return res.status(500).json({ message: 'Internal server error' });
+  try {
+    const { sessionId } = req.params;
+    const session = await ConversationSession.findById(sessionId);
+    if (!session) return res.status(404).json({ message: 'Session not found' });
+    if (!session.userId.equals(req.user._id)) {
+      return res.status(403).json({ message: 'Not your session' });
     }
-  };
-  
+    res.json(session);
+  } catch (error) {
+    console.error('Error in getSession:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
